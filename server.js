@@ -23,14 +23,14 @@ const db = new sqlite3.Database(DB_FILE);
 if (!dbExists) {
   db.serialize(() => {
     db.run(
-      "CREATE TABLE users (id INTEGER PRIMARY KEY, username TEXT, email TEXT, password TEXT)"
+      "CREATE TABLE users (id INTEGER PRIMARY KEY, username TEXT, email TEXT, password TEXT, likedMovies TEXT)"
     );
 
     // Insert sample users for demonstration
     const insertUser = db.prepare(
-      "INSERT INTO users (username, email, password) VALUES (?, ?, ?)"
+      "INSERT INTO users (username, email, password, likedMovies) VALUES (?, ?, ?, ?)"
     );
-    insertUser.run("admin", "admin@example.com", "admin");
+    insertUser.run("admin", "admin@example.com", "admin", '{"movies": []}');
     insertUser.finalize();
   });
 }
@@ -76,8 +76,8 @@ app.post("/api/register", (req, res) => {
     } else {
       // Email doesn't exist, insert the new user
       db.run(
-        "INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
-        [username, email, password],
+        "INSERT INTO users (username, email, password, likedMovies) VALUES (?, ?, ?, ?)",
+        [username, email, password, ""],
         function (err) {
           if (err) {
             console.error("Database error:", err.message);
